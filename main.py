@@ -8,6 +8,7 @@ from transport import Dispatcher
 
 from commands import Command, SwitchingPowerChannel
 from reading_telemetry import reading_telemetry
+from telemetry_logger import FileTelemetryExporter
 
 dispatcher = Dispatcher()
 app = FastAPI()
@@ -20,17 +21,6 @@ class Channel(BaseModel):
     id: int
     current: str
     voltage: str
-
-
-@app.get("/")
-def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    dispatcher.sent_command(name)
-    return {"message": f"Hello {name}"}
 
 
 @app.post("/channel")
@@ -50,7 +40,8 @@ async def driver_connection():
     loop.create_task(
         reading_telemetry(
             dispatcher,
-            Command(root_level='SOURce', channel=1, secondary_level='CURRent')
+            Command(root_level='SOURce', channel=1, secondary_level='CURRent'),
+            FileTelemetryExporter('export_telemetry.txt')
         )
     )
 
