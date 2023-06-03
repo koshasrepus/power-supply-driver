@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "power-supply-driver"
+version = "0.1.0"
+description = ""
+authors = ["alexander.evseev <alexandr.evseev@balance-pl.ru>"]
+readme = "README.md"
+packages = [{include = "power_supply_driver"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.2"
+uvicorn = "^0.22.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
