@@ -20,7 +20,7 @@ class Worker:
             writer.write(message.encode())
             if message == 'close':
                 break
-        # TODO: Закрыть соединение с Redis
+            await writer.drain()
         writer.close()
         print('Start close')
         await writer.wait_closed()
