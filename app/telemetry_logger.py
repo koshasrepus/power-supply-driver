@@ -20,4 +20,4 @@ class FileTelemetryExporter(AbstractTelemetryExporter):
         with open(self.file_name, 'a') as f:
             line_to_write = {'time': datetime.datetime.now().strftime(self.TIME_FORMAT), 'data': message}
             json.dump(line_to_write, f)
-            f.write('\n') #TODO: Закончил здесь
+            f.write('\n')
