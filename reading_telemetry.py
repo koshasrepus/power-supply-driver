@@ -1,7 +1,7 @@
 import json
 from asyncio import sleep
 
-from transport import Dispatcher
+from dispatcher import Dispatcher
 from commands import Command
 from telemetry_logger import AbstractTelemetryExporter
 

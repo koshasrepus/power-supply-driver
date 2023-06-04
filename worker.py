@@ -1,7 +1,7 @@
 import sys
 import asyncio
 
-from transport import Dispatcher
+from dispatcher import Dispatcher
 
 
 class Worker:

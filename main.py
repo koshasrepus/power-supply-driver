@@ -1,10 +1,11 @@
+import os
 import asyncio
 
 from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
 
 from worker import Worker
-from transport import Dispatcher
+from dispatcher import Dispatcher
 
 from commands import Command, SwitchingPowerChannel
 from reading_telemetry import reading_telemetry
@@ -28,11 +29,24 @@ async def create_channel(channel: Channel):
     turn_on_power_channel = SwitchingPowerChannel(channel.id, channel.current, channel.voltage)
     for command in turn_on_power_channel:
         dispatcher.sent_command(command)
-    return {"status": 'Ok'}
+    return 201, {"status": 'Ok'}
+
+
+@app.get('/channel')
+async def get_channel_states():
+    with open('export_telemetry.txt', 'rb') as f:
+        try:
+            f.seek(-2, os.SEEK_END)
+            while f.read(1) != b'\n':
+                f.seek(-2, os.SEEK_CUR)
+        except OSError:
+            f.seek(0)
+        last_line = f.readline().decode().strip()
+    return {"data": last_line}
 
 
 @app.on_event('startup')
-async def driver_connection():
+def driver_connection():
     worker = Worker(dispatcher)
     loop = asyncio.get_event_loop()
 
