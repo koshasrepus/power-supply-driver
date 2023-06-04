@@ -22,8 +22,8 @@ class FileChannelStates(AbstractChannelStates):
                     f.seek(-2, os.SEEK_CUR)
             except OSError:
                 f.seek(0)
-            last_line = f.readline().decode().strip()
-            return last_line
+            last_line = f.readline().decode()
+            return last_line.strip()
 
 
 def channel_states(states_reader: AbstractChannelStates = None):
