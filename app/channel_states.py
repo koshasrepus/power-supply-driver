@@ -1,3 +1,4 @@
+import json
 import os
 from abc import ABC, abstractmethod
 
@@ -15,15 +16,25 @@ class FileChannelStates(AbstractChannelStates):
         self.file_name = file_name
 
     def states(self):
+        log_data = []
         with open(self.file_name, 'rb') as f:
             try:
                 f.seek(-2, os.SEEK_END)
-                while f.read(1) != b'\n':
+                while len(log_data) < 4:
+                    current_character = f.read(1)
+                    line = []
+                    while current_character != b'\n':
+                        line.append(current_character.decode('ascii'))
+                        f.seek(-2, os.SEEK_CUR)
+                        current_character = f.read(1)
+                    cur_line = ''.join(line[::-1])
+                    log_data.append(
+                        json.loads(cur_line)
+                    )
                     f.seek(-2, os.SEEK_CUR)
             except OSError:
                 f.seek(0)
-            last_line = f.readline().decode()
-            return last_line.strip()
+            return log_data
 
 
 def channel_states(states_reader: AbstractChannelStates = None):

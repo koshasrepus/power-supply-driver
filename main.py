@@ -4,10 +4,11 @@ from fastapi import FastAPI
 
 from app.channel_states import channel_states
 from app.client import ClientPowerSupply
-from app.commands import ReadTelemetryChannel, SwitchingPowerChannel
+from app.commands import (OffChannel, ReadTelemetryChannel,
+                          SwitchingPowerChannel)
 from app.config import config
 from app.dispatcher import Dispatcher
-from app.parameter_models import Channel
+from app.query_body_models import TurnOffChannel, TurnOnChannel
 from app.reading_telemetry import reading_telemetry
 from app.telemetry_logger import FileTelemetryExporter
 
@@ -16,10 +17,12 @@ app = FastAPI()
 
 
 @app.post("/channel")
-async def create_channel(channel: Channel):
+async def create_channel(channel: TurnOnChannel):
     turn_on_power_channel = SwitchingPowerChannel(channel.id, channel.current, channel.voltage)
     for command in turn_on_power_channel:
         dispatcher.sent_command(command)
+        result = await dispatcher.get_message()
+        print(result)
     return {"status": 'Ok'}
 
 
@@ -29,9 +32,13 @@ async def get_channel_states():
     return {"data": data}
 
 
-@app.delete('/channel')
-async def off_channel(id: int):
-    pass
+@app.patch('/channel')
+async def off_channel(channel: TurnOffChannel):
+    off_channel_command = OffChannel(channel.id)
+    dispatcher.sent_command(next(off_channel_command))
+    result = await dispatcher.get_message()
+    print(result)
+    return {"status": 'Ok'}
 
 
 @app.on_event('startup')
@@ -42,6 +49,7 @@ def driver_connection():
         reading_telemetry(
             dispatcher,
             ReadTelemetryChannel(),
-            FileTelemetryExporter(config.telemetry_export_file)
+            FileTelemetryExporter(config.telemetry_export_file),
+            config.telemetry_delay
         )
     )

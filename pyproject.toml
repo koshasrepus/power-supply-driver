@@ -2,7 +2,7 @@
 name = "power-supply-driver"
 version = "0.1.0"
 description = ""
-authors = ["alexander.evseev <alexandr.evseev@balance-pl.ru>"]
+authors = ["alexander.evseev <evseevaleksandr89@mail.ru>"]
 readme = "README.md"
 packages = [{include = "power_supply_driver"}]
 

@@ -40,6 +40,16 @@ class SwitchingPowerChannel(BaseChannel):
             self.commands.append(str(command))
 
 
+class OffChannel(BaseChannel):
+    def __init__(self, channel_id: int):
+        super(OffChannel, self).__init__()
+        self.init_commands(channel_id)
+
+    def init_commands(self, channel_id: int):
+        command = Command('OUTPut', channel_id, 'STATe', parameters='OFF')
+        self.commands.append(str(command))
+
+
 class ReadTelemetryChannel(BaseChannel):
     def __init__(self):
         super(ReadTelemetryChannel, self).__init__()
