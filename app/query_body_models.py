@@ -9,7 +9,7 @@ class Channel(BaseModel):
 
 class TurnOnChannel(Channel):
     current: str
-    voltage: str
+    volt: str
 
 
 class TurnOffChannel(Channel):

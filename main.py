@@ -2,7 +2,7 @@ import asyncio
 
 from fastapi import FastAPI
 
-from app.channel_states import channel_states
+from app.channel_states import get_channel_states
 from app.client import ClientPowerSupply
 from app.commands import (OffChannel, ReadTelemetryChannel,
                           SwitchingPowerChannel)
@@ -17,8 +17,8 @@ app = FastAPI()
 
 
 @app.post("/channel")
-async def create_channel(channel: TurnOnChannel):
-    turn_on_power_channel = SwitchingPowerChannel(channel.id, channel.current, channel.voltage)
+async def turn_on_channel(channel: TurnOnChannel):
+    turn_on_power_channel = SwitchingPowerChannel(channel.id, channel.current, channel.volt)
     for command in turn_on_power_channel:
         dispatcher.sent_command(command)
         result = await dispatcher.get_message()
@@ -26,19 +26,19 @@ async def create_channel(channel: TurnOnChannel):
     return {"status": 'Ok'}
 
 
-@app.get('/channel')
-async def get_channel_states():
-    data = channel_states()
-    return {"data": data}
-
-
 @app.patch('/channel')
-async def off_channel(channel: TurnOffChannel):
+async def turn_off_channel(channel: TurnOffChannel):
     off_channel_command = OffChannel(channel.id)
     dispatcher.sent_command(next(off_channel_command))
     result = await dispatcher.get_message()
     print(result)
     return {"status": 'Ok'}
+
+
+@app.get('/channel')
+async def channel_states():
+    data = get_channel_states()
+    return {"data": data}
 
 
 @app.on_event('startup')

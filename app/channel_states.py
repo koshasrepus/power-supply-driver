@@ -16,17 +16,23 @@ class FileChannelStates(AbstractChannelStates):
         self.file_name = file_name
 
     def states(self):
+        """Возвращает последние 4 строки из файла"""
         log_data = []
+        seek_step = -2
         with open(self.file_name, 'rb') as f:
             try:
-                f.seek(-2, os.SEEK_END)
+                f.seek(seek_step, os.SEEK_END)
                 while len(log_data) < 4:
                     current_character = f.read(1)
                     line = []
-                    while current_character != b'\n':
+                    while current_character != b'\n' and f.tell():
                         line.append(current_character.decode('ascii'))
-                        f.seek(-2, os.SEEK_CUR)
+                        if f.tell() == 1:
+                            seek_step = -1
+                        f.seek(seek_step, os.SEEK_CUR)
                         current_character = f.read(1)
+                        if seek_step == -1:
+                            break
                     cur_line = ''.join(line[::-1])
                     log_data.append(
                         json.loads(cur_line)
@@ -37,7 +43,7 @@ class FileChannelStates(AbstractChannelStates):
             return log_data
 
 
-def channel_states(states_reader: AbstractChannelStates = None):
+def get_channel_states(states_reader: AbstractChannelStates = None):
     states_reader = states_reader or FileChannelStates(config.telemetry_export_file)
     result = states_reader.states()
     return result
