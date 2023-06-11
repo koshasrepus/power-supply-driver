@@ -2,16 +2,16 @@ import json
 import os
 from abc import ABC, abstractmethod
 
-from app.config import config
+from config import config
 
 
-class AbstractChannelStates(ABC):
+class AbstractTelemetryExtract(ABC):
     @abstractmethod
     def states(self):
         pass
 
 
-class FileChannelStates(AbstractChannelStates):
+class FileTelemetryExtract(AbstractTelemetryExtract):
     def __init__(self, file_name: str):
         self.file_name = file_name
 
@@ -43,7 +43,7 @@ class FileChannelStates(AbstractChannelStates):
             return log_data
 
 
-def get_channel_states(states_reader: AbstractChannelStates = None):
-    states_reader = states_reader or FileChannelStates(config.telemetry_export_file)
+def get_channel_states(states_reader: AbstractTelemetryExtract = None):
+    states_reader = states_reader or FileTelemetryExtract(config.telemetry_export_file)
     result = states_reader.states()
     return result

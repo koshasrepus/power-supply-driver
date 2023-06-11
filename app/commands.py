@@ -2,16 +2,12 @@ from collections import deque
 
 
 class Command:
-    def __init__(self, root_level, channel, secondary_level, *, tertiary_level=None, parameters=None):
-        self.root_level = root_level
-        self.channel = channel
-        self.secondary_level = secondary_level
-        self.tertiary_level = (':' + tertiary_level) if tertiary_level else ''
+    def __init__(self, *args, channel=None, parameters=None):
+        self.keywords = f':{args[0]}{channel or ""}:' + ':'.join(args[1:])
         self.parameters = '?' if not parameters else (' ' + parameters)
 
     def __str__(self):
-        return f':{self.root_level}{self.channel}:' \
-               f'{self.secondary_level}{self.tertiary_level}{self.parameters}'
+        return self.keywords + self.parameters
 
 
 class BaseChannel:
@@ -33,9 +29,9 @@ class SwitchingPowerChannel(BaseChannel):
         self.init_commands(channel_id, current, voltage)
 
     def init_commands(self, channel_id: int, current: str, voltage: str):
-        set_current = Command('SOURce', channel_id, 'CURRent', parameters=current)
-        set_voltage = Command('SOURce', channel_id, 'VOLTage', parameters=voltage)
-        turn_power_channel = Command('OUTPUT', channel_id, 'STATe', parameters='ON')
+        set_current = Command('SOURce', 'CURRent', channel=channel_id,  parameters=current)
+        set_voltage = Command('SOURce', 'VOLTage', channel=channel_id, parameters=voltage)
+        turn_power_channel = Command('OUTPUT', 'STATe', channel=channel_id, parameters='ON')
         for command in (set_current, set_voltage, turn_power_channel):
             self.commands.append(str(command))
 
@@ -46,7 +42,7 @@ class OffChannel(BaseChannel):
         self.init_commands(channel_id)
 
     def init_commands(self, channel_id: int):
-        command = Command('OUTPut', channel_id, 'STATe', parameters='OFF')
+        command = Command('OUTPut', 'STATe',  channel=channel_id, parameters='OFF')
         self.commands.append(str(command))
 
 
@@ -56,5 +52,9 @@ class ReadTelemetryChannel(BaseChannel):
         self.init_commands()
 
     def init_commands(self):
-        for command in (('MEASure', channel_id, 'ALL') for channel_id in range(1, 4 + 1)):
-            self.commands.append(str(Command(*command)))
+        for channel in range(1, 4 + 1):
+            self.commands.append(
+                str(
+                    Command('MEASure', 'ALL',  channel=channel)
+                )
+            )

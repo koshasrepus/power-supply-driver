@@ -4,13 +4,16 @@ from fastapi import FastAPI
 
 from app.channel_states import get_channel_states
 from app.client import ClientPowerSupply
-from app.commands import (OffChannel, ReadTelemetryChannel,
-                          SwitchingPowerChannel)
-from app.config import config
+from app.commands import (
+    OffChannel,
+    ReadTelemetryChannel,
+    SwitchingPowerChannel,
+)
 from app.dispatcher import Dispatcher
 from app.query_body_models import TurnOffChannel, TurnOnChannel
 from app.reading_telemetry import reading_telemetry
 from app.telemetry_logger import FileTelemetryExporter
+from config import config
 
 dispatcher = Dispatcher()
 app = FastAPI()
@@ -20,8 +23,8 @@ app = FastAPI()
 async def turn_on_channel(channel: TurnOnChannel):
     turn_on_power_channel = SwitchingPowerChannel(channel.id, channel.current, channel.volt)
     for command in turn_on_power_channel:
-        dispatcher.sent_command(command)
-        result = await dispatcher.get_message()
+        dispatcher.sent_data(command)
+        result = await dispatcher.get_result()
         print(result)
     return {"status": 'Ok'}
 
@@ -29,8 +32,8 @@ async def turn_on_channel(channel: TurnOnChannel):
 @app.patch('/channel')
 async def turn_off_channel(channel: TurnOffChannel):
     off_channel_command = OffChannel(channel.id)
-    dispatcher.sent_command(next(off_channel_command))
-    result = await dispatcher.get_message()
+    dispatcher.sent_data(next(off_channel_command))
+    result = await dispatcher.get_result()
     print(result)
     return {"status": 'Ok'}
 

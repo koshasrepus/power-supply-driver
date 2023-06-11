@@ -9,7 +9,7 @@ poetry install --no-root
 Драйвер при запуске будет пытаться создать TCP соединение с параметрами:
 ```commandline
 POWER_SUPPLY_HOST: 127.0.0.1
-POWER_SUPPLY_PORT: 888
+POWER_SUPPLY_PORT: 8888
 ```
 Запуск Драйвера:
 ```commandline

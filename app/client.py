@@ -8,7 +8,7 @@ class ClientPowerSupply:
         self.transport = transport
 
     @staticmethod
-    async def command_process(reader, writer, message):
+    async def sending_data(reader, writer, message):
         message = message + '\n'
         writer.write(message.encode())
         data = await reader.read(100)
@@ -17,15 +17,15 @@ class ClientPowerSupply:
     async def run_client(self):
         print('Try connect...')
         reader, writer = await asyncio.open_connection(
-            '127.0.0.1', 8888
+            self.host, self.port
         )
         print('Connection created!')
         try:
             while True:
-                message = await self.transport.get_command()
-                result = await self.command_process(reader, writer, message)
+                data = await self.transport.get_data()
+                result = await self.sending_data(reader, writer, data)
                 await writer.drain()
-                await self.transport.sent_message(result)
+                await self.transport.sent_result(result)
         finally:
             writer.close()
             await writer.wait_closed()

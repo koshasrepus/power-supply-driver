@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from app.config import config
+from config import config
 from main import app, dispatcher
 
 

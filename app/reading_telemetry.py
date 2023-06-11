@@ -12,8 +12,8 @@ async def reading_telemetry(
     prefix = ''
     while True:
         for command in commands_telemetry:
-            dispatcher.sent_command(command)
-            message = await dispatcher.get_message()
+            dispatcher.sent_data(command)
+            message = await dispatcher.get_result()
             if 'MEASure1' in command:
                 prefix = 'ch1: '
             elif 'MEASure2' in command:
